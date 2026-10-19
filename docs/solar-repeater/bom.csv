@@ -8,3 +8,6 @@ xiao-harbor-breeze,5,Heat-shrink / Kapton tape / neutral-cure silicone,1,1.00,,s
 rak4631-harbor-breeze,1,Harbor Breeze 60 lm 1 W solar LED spot light,1,9.98-15.00,https://www.lowes.com/pd/Harbor-Breeze-60-Lumens-1-Watt-Black-Warm-White-Solar-LED-Spot-light/5018244381,2026-07 deal history,
 rak4631-harbor-breeze,2,RAK19007 + RAK4631 bundle,1,29.99,https://ameridroid.com/products/wisblock-rak19007-rak4631-board,cached,Solar input Li-ion only and 5.5 V max
 rak4631-harbor-breeze,3,IPEX-to-SMA pigtail + 915 MHz antenna,1,6.00-12.00,,typical/unverified,
+xiao-reuse-esp32s3-kit-radio,1,Harbor Breeze 60 lm 1 W solar LED spot light,1,9.98-15.00,https://www.lowes.com/pd/Harbor-Breeze-60-Lumens-1-Watt-Black-Warm-White-Solar-LED-Spot-light/5018244381,2026-07 deal history,
+xiao-reuse-esp32s3-kit-radio,2,Seeed XIAO nRF52840 (bare board),1,9.99,https://www.seeedstudio.com/Seeed-XIAO-BLE-nRF52840-p-5201.html,2026-10-19,$8.99 each for 10+; reuse the Wio-SX1262 (B2B version) and 2 dBi antenna from a XIAO ESP32S3 kit; flash xiao_nrf52840-wio-b2b* builds
+xiao-reuse-esp32s3-kit-radio,3,Pin headers (2x 1x7 2.54 mm),1,0.20,,shop stock,Stack the XIAO nRF52840 on the Wio header holes

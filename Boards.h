@@ -1099,16 +1099,30 @@
       #define LED_ON LOW
       #define LED_OFF HIGH
 
-      // Wio-SX1262 on the XIAO board-to-board connector
-      const int pin_rxen = 5;          // D5, P0.05
+      #if defined(XIAO_WIO_B2B)
+        // Wio-SX1262 for XIAO V1.0, the board-to-board connector version
+        // shipped in the XIAO ESP32S3 kit, soldered to the XIAO nRF52840
+        // through its 2x7 header holes (the nRF52840 has no B2B connector).
+        // Per Seeed's schematic: J1 = D0 DIO1, D1 BUSY, D2 RST, D3 NSS,
+        // D4 RF_SW1; J2 = D10 MOSI, D9 MISO, D8 SCK.
+        const int pin_rxen = 4;        // D4, P0.04 (RF_SW1)
+        const int pin_reset = 2;       // D2, P0.28
+        const int pin_cs = 3;          // D3, P0.29
+        const int pin_busy = 1;        // D1, P0.03
+        const int pin_dio = 0;         // D0, P0.02 (DIO1)
+      #else
+        // Wio-SX1262 for XIAO (SKU 113010003, as in the XIAO nRF52840 kit),
+        // stacked on the XIAO header pins
+        const int pin_rxen = 5;        // D5, P0.05
+        const int pin_reset = 2;       // D2, P0.28
+        const int pin_cs = 4;          // D4, P0.04
+        const int pin_busy = 3;        // D3, P0.29
+        const int pin_dio = 1;         // D1, P0.03 (DIO1)
+      #endif
       const int pin_txen = -1;         // TX path is selected by DIO2
-      const int pin_reset = 2;         // D2, P0.28
-      const int pin_cs = 4;            // D4, P0.04
       const int pin_sclk = 8;          // D8, P1.13
       const int pin_mosi = 10;         // D10, P1.15
       const int pin_miso = 9;          // D9, P1.14
-      const int pin_busy = 3;          // D3, P0.29
-      const int pin_dio = 1;           // D1, P0.03 (DIO1)
       const int pin_led_rx = LED_BLUE;
       const int pin_led_tx = LED_GREEN;
       const int pin_tcxo_enable = -1;  // TCXO powered by DIO3 at 1.8 V
