@@ -525,6 +525,10 @@ bool init_pmu() {
     digitalWrite(VBAT_ENABLE, LOW);
     analogReference(AR_INTERNAL_3_0);
     analogReadResolution(12);
+    // The divider's ~340 kOhm source impedance needs a long SAADC
+    // acquisition time (Nordic: 40 us above 200 kOhm); the 3 us default
+    // reads low.
+    analogSampleTime(40);
     return true;
   #elif BOARD_MODEL == BOARD_TBEAM
     Wire.begin(I2C_SDA, I2C_SCL);

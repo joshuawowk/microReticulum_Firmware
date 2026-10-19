@@ -51,6 +51,10 @@
     #endif
   #endif
 
+  #if !HAS_PMU
+    #warning "HEADLESS_REPEATER: this board has no battery sensing, so low-battery hibernation is disabled"
+  #endif
+
   // Readings below this are treated as "no battery fitted" (USB or bench
   // supply only) and never trigger a shutdown.
   #ifndef REPEATER_NO_BATTERY_V

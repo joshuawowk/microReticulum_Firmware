@@ -43,8 +43,14 @@
 
 #if defined(HEADLESS_REPEATER)
 
+#if MCU_VARIANT == MCU_NRF52
+  // The hibernation loop wakes to feed the watchdog between battery checks
+  static_assert(REPEATER_HIBERNATE_CHECK_S < WDT_TIMEOUT, "REPEATER_HIBERNATE_CHECK_S must be shorter than WDT_TIMEOUT");
+#endif
+
 #if MCU_VARIANT == MCU_ESP32
   #include <esp_sleep.h>
+  #include <driver/gpio.h>
   #define REPEATER_ISR_ATTR IRAM_ATTR
   // Survive deep sleep so a timer wake knows it is part of a hibernation
   RTC_DATA_ATTR bool repeater_rtc_hibernating = false;
@@ -176,6 +182,14 @@ static void repeater_deep_sleep() {
     digitalWrite(LORA_PA_PWR_EN, LOW);
     digitalWrite(Vext, HIGH);
   #endif
+  #if defined(LORA_TRANSPORT)
+    // GPIOs float in deep sleep, and a falling edge on NSS wakes a sleeping
+    // SX126x into standby. Hold NSS high until the next boot releases it.
+    pinMode(pin_cs, OUTPUT);
+    digitalWrite(pin_cs, HIGH);
+    gpio_hold_en((gpio_num_t)pin_cs);
+    gpio_deep_sleep_hold_en();
+  #endif
   Serial.flush();
   esp_sleep_enable_timer_wakeup((uint64_t)REPEATER_HIBERNATE_CHECK_S * 1000000ULL);
   esp_deep_sleep_start();
@@ -202,6 +216,17 @@ void repeater_hibernate(float voltage) {
 
   #if HAS_BLUETOOTH || HAS_BLE == true
     if (bt_state != BT_STATE_OFF && bt_state != BT_STATE_NA) { bt_stop(); }
+    #if MCU_VARIANT == MCU_NRF52
+      // bt_stop() only updates the state on nRF52; also stop advertising
+      // and drop any client so the SoftDevice radio goes quiet.
+      if (bt_ready) {
+        Bluefruit.Advertising.restartOnDisconnect(false);
+        Bluefruit.Advertising.stop();
+        for (uint16_t conn = 0; conn < BLE_MAX_CONNECTION; conn++) {
+          if (Bluefruit.connected(conn)) { Bluefruit.disconnect(conn); }
+        }
+      }
+    #endif
   #endif
 
   led_rx_off();
@@ -238,10 +263,12 @@ void repeater_hibernate(float voltage) {
 // go straight back to deep sleep if it has not recovered yet.
 void repeater_wake_check() {
   #if MCU_VARIANT == MCU_ESP32
-    if (!repeater_rtc_hibernating) { return; }
-    if (esp_sleep_get_wakeup_cause() != ESP_SLEEP_WAKEUP_TIMER) {
-      // Woken by a button or reset: a person is here, boot normally
+    if (!repeater_rtc_hibernating || esp_sleep_get_wakeup_cause() != ESP_SLEEP_WAKEUP_TIMER) {
+      // Normal boot, or woken by a button or reset (a person is here)
       repeater_rtc_hibernating = false;
+      #if defined(LORA_TRANSPORT)
+        gpio_hold_dis((gpio_num_t)pin_cs);
+      #endif
       return;
     }
     #if HAS_PMU
@@ -251,6 +278,9 @@ void repeater_wake_check() {
     if (!repeater_battery_low(v, REPEATER_RESUME_V)) {
       if (++repeater_rtc_good_checks >= REPEATER_RESUME_CHECKS) {
         repeater_rtc_hibernating = false;
+        #if defined(LORA_TRANSPORT)
+          gpio_hold_dis((gpio_num_t)pin_cs);
+        #endif
         printf("[repeater] Battery recovered (%.2f V), resuming\n", v);
         return;
       }
