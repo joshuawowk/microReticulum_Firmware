@@ -219,6 +219,15 @@ extern RNS::Reticulum reticulum;
   void boot_seq() { }
 #endif
 
+#if defined(HEADLESS_REPEATER)
+	// Headless repeaters keep their LEDs dark. Each board's *_on() below is
+	// renamed out of the way and replaced by a no-op after this block, while
+	// the board's *_off() (which knows the LED polarity) stays in use.
+	#define led_rx_on repeater_unused_led_rx_on
+	#define led_tx_on repeater_unused_led_tx_on
+	#define led_id_on repeater_unused_led_id_on
+#endif
+
 #if MCU_VARIANT == MCU_1284P || MCU_VARIANT == MCU_2560 || MCU_VARIANT == MCU_NATIVE
 	// -1 = "no LED" — needed for native builds where the LED pins are
 	// optional. On AVR the const-int defaults are always >= 0, so these
@@ -422,6 +431,15 @@ extern RNS::Reticulum reticulum;
 		void led_id_on()  { }
 		void led_id_off() { }
 	#endif
+#endif
+
+#if defined(HEADLESS_REPEATER)
+	#undef led_rx_on
+	#undef led_tx_on
+	#undef led_id_on
+	void led_rx_on() { }
+	void led_tx_on() { }
+	void led_id_on() { }
 #endif
 
 void hard_reset(void) {

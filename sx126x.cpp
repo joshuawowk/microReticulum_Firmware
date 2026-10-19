@@ -450,6 +450,12 @@ int sx126x::begin(uint32_t frequency) {
   if (!_preinit_done) { if (!preInit()) { return false; } }
   if (_rxen != -1) { pinMode(_rxen, OUTPUT); }
 
+  #if SX126X_USE_DCDC
+    // Power the radio core from the DC-DC converter instead of the LDO
+    uint8_t regulator_mode = 0x01;
+    executeOpcode(OP_REGULATOR_MODE_6X, &regulator_mode, 1);
+  #endif
+
   calibrate();
   calibrate_image(frequency);
   enableTCXO();
@@ -1041,9 +1047,17 @@ void ISR_VECT sx126x::handleDio0Rise() {
   }
 }
 
+#if defined(HEADLESS_REPEATER)
+  // Repeater.h: wakes the sleeping main loop when a packet arrives
+  void repeater_wake_from_isr();
+#endif
+
 void ISR_VECT sx126x::onDio0Rise() {
   #if MCU_VARIANT == MCU_ESP32 || MCU_VARIANT == MCU_NRF52 || MCU_VARIANT == MCU_NATIVE
     sx126x_modem._dio0_pending = true;
+    #if defined(HEADLESS_REPEATER)
+      repeater_wake_from_isr();
+    #endif
   #else
     sx126x_modem.handleDio0Rise();
   #endif

@@ -82,7 +82,11 @@ def post_upload(source, target, env):
     # do some actions
     platform = env.GetProjectOption("platform")
     board = env.GetProjectOption("board")
-    if ("espressif32" in platform):
+    if env.GetProjectOption("custom_variant").endswith("_repeater") or "_repeater_" in env.GetProjectOption("custom_variant"):
+        # Headless repeater builds provision themselves on first boot and
+        # do not validate the firmware hash, so rnodeconf is not needed
+        print("Headless repeater build: skipping rnodeconf provisioning")
+    elif ("espressif32" in platform):
         time.sleep(10)
         # device provisioning is incomplete and only currently appropriate for 915MHz T-Beam
         #device_wipe(env)

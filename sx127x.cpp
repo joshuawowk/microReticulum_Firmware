@@ -547,9 +547,17 @@ void ISR_VECT sx127x::handleDio0Rise() {
   }
 }
 
+#if defined(HEADLESS_REPEATER)
+  // Repeater.h: wakes the sleeping main loop when a packet arrives
+  void repeater_wake_from_isr();
+#endif
+
 void ISR_VECT sx127x::onDio0Rise() {
   #if MCU_VARIANT == MCU_ESP32 || MCU_VARIANT == MCU_NRF52 || MCU_VARIANT == MCU_NATIVE
     sx127x_modem._dio0_pending = true;
+    #if defined(HEADLESS_REPEATER)
+      repeater_wake_from_isr();
+    #endif
   #else
     sx127x_modem.handleDio0Rise();
   #endif
