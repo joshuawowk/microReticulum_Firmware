@@ -465,6 +465,8 @@ void dump_filesystem(const char* basepath, uint8_t level = 0, uint8_t max_level 
 }
 #endif
 
+#include "Repeater.h"
+
 void setup() {
 
   // Initialise serial communication
@@ -475,6 +477,11 @@ void setup() {
 
   // Redirect stdout to KISS framed logs
   install_kiss_stdout();
+
+  #if defined(HEADLESS_REPEATER)
+    // ESP32 hibernation wake: back to deep sleep at once if still low
+    repeater_wake_check();
+  #endif
 
   // CBA Safely wait for serial initialization
   while (!Serial) {
@@ -567,6 +574,10 @@ void setup() {
     #endif
 
     if (!eeprom_begin()) { Serial.write("EEPROM initialisation failed.\r\n"); }
+  #endif
+
+  #if defined(HEADLESS_REPEATER)
+    repeater_setup();
   #endif
 
   // Seed the PRNG for CSMA R-value selection
@@ -858,6 +869,11 @@ void setup() {
   avoid_interference = false;
 #endif
 
+  #if defined(HEADLESS_REPEATER)
+    // Do not start the radio on a battery that is already below the cutoff
+    repeater_boot_check();
+  #endif
+
   // Validate board health, EEPROM and config
   validate_status();
 
@@ -1058,6 +1074,10 @@ void setup() {
       HEAD("Starting RNS...\r\n", RNS::LOG_VERBOSE);
 #if defined(RNS_MEM_LOG)
       RNS::loglevel(RNS::LOG_MEM);
+#elif defined(HEADLESS_REPEATER)
+      // Nobody reads per-packet trace logs on a headless node, and
+      // formatting them costs CPU time on every packet
+      RNS::loglevel(REPEATER_LOG_LEVEL);
 #else
       RNS::loglevel(RNS::LOG_TRACE);
 #endif
@@ -2643,7 +2663,17 @@ void tx_queue_handler() {
 
 void work_while_waiting() { loop(); }
 
+#if defined(HEADLESS_REPEATER)
+  // microReticulum re-enters loop() through its loop callback while it works
+  // through long jobs; only the outermost pass may put the CPU to sleep.
+  static uint8_t loop_depth = 0;
+#endif
+
 void loop() {
+
+  #if defined(HEADLESS_REPEATER)
+    loop_depth++;
+  #endif
 
   #if MCU_VARIANT == MCU_NATIVE
     // Deferred-reboot hook: a KISS-driven property change or CMD_RESET in
@@ -2790,6 +2820,11 @@ void loop() {
       kiss_indicate_error(ERROR_MEMORY_LOW); memory_low = false;
     #endif
   }
+
+  #if defined(HEADLESS_REPEATER)
+    if (loop_depth == 1) { repeater_loop(); }
+    loop_depth--;
+  #endif
 }
 
 void sleep_now() {

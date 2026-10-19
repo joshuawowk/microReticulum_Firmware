@@ -282,7 +282,7 @@ RNS::Bytes serve_page(
         add_interface_details(content, lora_interface);
       	content << "  },\n";
 #endif
-#if defined(UDP_TRANSPORT)
+#if HAS_WIFI && defined(UDP_TRANSPORT)
         if (wifi_mode != WR_WIFI_OFF && udp_interface) {
           content << "  \"" << udp_interface.name().c_str() << "\": {\n";
           content << "    \"ip_addr\": \"" << wr_device_ip.toString().c_str() << "\",\n";

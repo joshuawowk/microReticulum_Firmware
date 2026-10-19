@@ -112,9 +112,17 @@ bool ISR_VECT sx128x::getPacketValidity() {
     else { return false; }
 }
 
+#if defined(HEADLESS_REPEATER)
+  // Repeater.h: wakes the sleeping main loop when a packet arrives
+  void repeater_wake_from_isr();
+#endif
+
 void ISR_VECT sx128x::onDio0Rise() {
   #if MCU_VARIANT == MCU_ESP32 || MCU_VARIANT == MCU_NRF52 || MCU_VARIANT == MCU_NATIVE
     sx128x_modem._dio0_pending = true;
+    #if defined(HEADLESS_REPEATER)
+      repeater_wake_from_isr();
+    #endif
   #else
     // Non-FreeRTOS platforms: run handler directly from ISR.
     // On the SX1280, there is a bug which can cause the busy line

@@ -198,7 +198,13 @@
   #define HAS_LORA_PA false
   #define HAS_LORA_LNA false
   #define PIN_DISP_SLEEP -1
-  #define VALIDATE_FIRMWARE true
+  #if defined(HEADLESS_REPEATER)
+    // Self-provisioned repeaters have no rnodeconf-written firmware hash to
+    // compare against, and must keep running after UF2/OTA updates.
+    #define VALIDATE_FIRMWARE false
+  #else
+    #define VALIDATE_FIRMWARE true
+  #endif
 
   #if defined(ENABLE_TCXO)
       #define HAS_TCXO true
@@ -816,6 +822,7 @@
   
   #elif MCU_VARIANT == MCU_NRF52
     #if BOARD_MODEL == BOARD_RAK4631
+      #define HAS_NRF_DCDC true      // RAK4630 module has the DC/DC inductor fitted
       #define HAS_EEPROM false
       #define HAS_DISPLAY true
       #define HAS_BLUETOOTH false
@@ -854,6 +861,7 @@
       const int pin_tcxo_enable = -1;
 
     #elif BOARD_MODEL == BOARD_RAK3401
+      #define HAS_NRF_DCDC true      // DC/DC inductor fitted (as RAK4630)
       #define HAS_EEPROM false
       #define HAS_DISPLAY false      // RAK19007 base board has no display in this kit
       #define HAS_BLUETOOTH false
@@ -1059,6 +1067,7 @@
       const int DISPLAY_RST = PIN_T114_TFT_RST;
 
     #elif BOARD_MODEL == BOARD_XIAO_NRF52
+      #define HAS_NRF_DCDC true      // XIAO nRF52840 has the DC/DC inductor fitted
       #define HAS_EEPROM false
       #define HAS_DISPLAY false
       #define HAS_BLUETOOTH false
@@ -1187,6 +1196,13 @@
     #define RXEN_IS_RF_SWITCH false
   #endif
 
+  // nRF52840 boards with the DC/DC regulator inductor fitted. Enabling DC/DC
+  // without the inductor stops the chip, so it is opt-in per board and only
+  // switched on by the headless repeater profile.
+  #ifndef HAS_NRF_DCDC
+    #define HAS_NRF_DCDC false
+  #endif
+
   // Default OCP value if not specified
   // in board configuration
   #ifndef OCP_TUNED
@@ -1213,5 +1229,7 @@
   #ifdef DISABLE_BLE
     #define HAS_BLE false
   #endif
+
+#include "RepeaterConfig.h"
 
 #endif

@@ -231,6 +231,14 @@ float pmu_temperature = PMU_TEMP_MIN-1;
   float bat_state_change_v = 0;
 #endif
 
+// Voltage range mapped to 0-100 % (overridden for LiFePO4 by RepeaterConfig.h)
+#ifndef BAT_PCT_V_MIN
+  #define BAT_PCT_V_MIN BAT_V_MIN
+#endif
+#ifndef BAT_PCT_V_MAX
+  #define BAT_PCT_V_MAX BAT_V_MAX
+#endif
+
 uint32_t last_pmu_update = 0;
 uint8_t pmu_target_pps = 1;
 int pmu_update_interval = 1000/pmu_target_pps;
@@ -283,7 +291,7 @@ void measure_battery() {
     #endif
 
     bat_v_samples[bat_samples_count%BAT_SAMPLES] = battery_measurement;
-    bat_p_samples[bat_samples_count%BAT_SAMPLES] = ((battery_measurement-BAT_V_MIN) / (BAT_V_MAX-BAT_V_MIN))*100.0;
+    bat_p_samples[bat_samples_count%BAT_SAMPLES] = ((battery_measurement-BAT_PCT_V_MIN) / (BAT_PCT_V_MAX-BAT_PCT_V_MIN))*100.0;
     
     bat_samples_count++;
     if (!battery_ready && bat_samples_count >= BAT_SAMPLES) {
