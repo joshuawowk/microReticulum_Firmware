@@ -141,6 +141,25 @@ New firmware release procedure:
 
   6. Upload all files (except README.md and esptool) to github release
 
+## Headless Solar Repeater
+
+The opt-in **headless repeater profile** (`-DHEADLESS_REPEATER`) turns a board
+into an unattended, solar-powered Reticulum transport node. It provides:
+
+- self-provisioning, so no `rnodeconf --autoinstall` is needed
+- CPU sleep between packets
+- low-battery hibernation with automatic recovery (Li-ion or LiFePO4)
+- dark LEDs, the SX126x DC-DC regulator, and other power trims
+
+Ready-made environments include `xiao_nrf52840-repeater[-lifepo4]`,
+`wiscore_rak4631-repeater[-lifepo4]`, `heltec_wifi_lora_32_V4-repeater`,
+`ttgo-lora32-v21-repeater` and `seeed_xiao_esp32s3-repeater`.
+
+See [docs/solar-repeater/README.md](docs/solar-repeater/README.md) for the
+lowest-cost build: a Lowe's Harbor Breeze solar spotlight with a Seeed XIAO
+nRF52840 + Wio-SX1262 for about $25–30. The guide covers the BOM, wiring for
+both cell chemistries, the power budget and configuration.
+
 ## Provisioning System and RNode Console
 
 This firmware adds a structured **Provisioning** subsystem on top of the legacy RNode KISS protocol and a single-page web app — the **RNode Console** — that drives it. Together they replace ad-hoc `rnodeconf` invocations for day-to-day setup and give the same view of a node whether you are sitting next to it with a USB cable or several LoRa hops away.
@@ -224,7 +243,7 @@ Common HATs / wirings are documented in `rnoded.example.conf`, including RAK6421
 
 - [x] Extend KISS interface to support config/control of the integrated microReticulum stack
 - [x] Add interface for easy customization of firmware
-- [ ] Add power management and sleep states to extend battery runtime
+- [x] Add power management and sleep states to extend battery runtime (opt-in headless repeater profile)
 - [x] Add build targets for NRF52 boards
 
 Please open an Issue if you have trouble building or using the firmware or daemon, and feel free to start a new Discussion for anything else.
