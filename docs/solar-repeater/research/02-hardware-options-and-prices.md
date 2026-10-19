@@ -29,7 +29,7 @@ price here is verified. Re-check prices before ordering.
 
 | Board | Price | MCU / radio | TCXO | Max TX | RX idle current (community) | Charger | Solar input | Firmware target in this repo | Notes |
 |---|---|---|---|---|---|---|---|---|---|
-| **XIAO nRF52840 + Wio-SX1262 kit** | $13.49 @ 10+ tier, [Seeed](https://www.seeedstudio.com/XIAO-nRF52840-Wio-SX1262-Kit-for-Meshtastic-p-6400.html) (seen 2026-10-19); $15.72 incl. tariffs, [Robotshop US](https://www.robotshop.com/products/xiao-nrf52840-wio-sx1262-kit-for-meshtastic) (cached) | nRF52840 / SX1262 | Yes ([wiki](https://wiki.seeedstudio.com/wio_sx1262/)) | +22 dBm | not documented | BQ25101, 50 mA (100 mA with P0.13 LOW), **4.2 V Li-ion only** | No dedicated input; VBUS pad range undocumented | **Added by this work** (`xiao_nrf52840`) | Keep P0.14 LOW (VBAT divider / P0.31 3.6 V limit). 21 × 17.8 mm. u.FL antenna on Wio module. Bootloader UF2, SoftDevice S140 7.3.0. |
+| **XIAO nRF52840 + Wio-SX1262 kit** | **$13.49 single unit, in stock**, [Seeed](https://www.seeedstudio.com/XIAO-nRF52840-Wio-SX1262-Kit-for-Meshtastic-p-6400.html) (re-checked 2026-10-19; no volume discount listed); $15.72 incl. tariffs, [Robotshop US](https://www.robotshop.com/products/xiao-nrf52840-wio-sx1262-kit-for-meshtastic) (cached). **No antenna included** (U.FL only, per [Meshtastic docs](https://meshtastic.org/docs/hardware/devices/seeed-studio/wio-sx1262/)); Seeed SMA-to-IPEX 120 mm cable $1.90. | nRF52840 / SX1262 | Yes ([wiki](https://wiki.seeedstudio.com/wio_sx1262/)) | +22 dBm | not documented | BQ25101, 50 mA (100 mA with P0.13 LOW), **4.2 V Li-ion only** | No dedicated input; VBUS pad range undocumented | **Added by this work** (`xiao_nrf52840`) | Keep P0.14 LOW (VBAT divider / P0.31 3.6 V limit). 21 × 17.8 mm. u.FL antenna on Wio module. Bootloader UF2, SoftDevice S140 7.3.0. |
 | XIAO nRF52840 Plus | $11.19, [Robotshop](https://www.robotshop.com/products/seeed-studio-xiao-nrf52840-plus) (cached); Wio-SX1262 $4.29 add-on | nRF52840 | — | — | — | BQ25101 class | — | (same pinout for the kit radio) | Bare MCU board. |
 | Faketec: ProMicro/SuperMini nRF52840 + HT-RA62 / E22-900M22S | ≈ EUR 10 total per [fakeTec_pcb README](https://github.com/gargomoma/fakeTec_pcb) (seen 2026-10-19); PCB ≈ EUR 0.40 | nRF52840 / SX1262 | HT-RA62, E22-xxxM-22S yes; RA-01SH no | 22 dBm | no measurement | nice!nano-clone charger | via board charger / v6 CN3791 (untested) | No | Clone quality varies; Faketec V4 gets hot charging (issue #57); LiFePO4 unsupported (#69). |
 | Heltec Mesh Node T114 | $17.90–$33.70, [Heltec](https://heltec.org/project/mesh-node-t114/) (seen 2026-10-19) | nRF52840 / SX1262 | not stated | 21 dBm | deep sleep ≈ 11 µA | not named | **5–6.5 V** solar input | Boards.h only (`heltec_t114-local` dev env) | 50.8 × 22.86 mm |
@@ -64,6 +64,20 @@ price here is verified. Re-check prices before ordering.
 | PG7 cable gland 10-pack | AUD 13.99 | [Element14 AU](https://au.element14.com/multicomp-pro/pg7dg/gland-pg7-3-6-5mm-pk10/dp/1621060) (cached) | No US price found |
 | Conformal coating, MG Chemicals 422B 340 g | $38.08 | [Hisco](https://www.hisco.com/Product/422B-340G-33018) (cached) | Expensive for one board; optional |
 | E22-900M22S | $6.60 qty 1 | LCSC (cached) | Faketec radio option |
+
+## Notes added on re-check (2026-10-19)
+
+* The Wio-SX1262 in the nRF52840 kit is **not** pin-compatible with the one in
+  the XIAO ESP32S3 kit ([Meshtastic](https://meshtastic.org/docs/hardware/devices/seeed-studio/wio-sx1262/)):
+  a module from the other kit needs firmware with matching pin definitions.
+  The `xiao_nrf52840` target uses the nRF52840 kit's wiring.
+* The 180 lm Harbor Breeze solar flood light lists two 18500 LiFePO4 cells
+  (Lowe's listing via search), more evidence that Harbor Breeze solar lights
+  commonly use LiFePO4.
+* SX1262 receive current: Semtech quotes 4.2–4.6 mA with the DC-DC regulator
+  ([product page](https://www.semtech.com/products/wireless-rf/lora-connect/sx1262),
+  [brochure](https://www.semtech.com/uploads/common/LoRa_products_sx126x.pdf));
+  module vendors report ≈ 8–10 mA in LDO mode.
 
 ## Uncertainties
 

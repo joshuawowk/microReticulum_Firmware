@@ -1,0 +1,10 @@
+build,item,part,qty,unit_price_usd,source,price_checked,notes
+xiao-harbor-breeze,1,Harbor Breeze 60 lm 1 W solar LED spot light (Lowe's 5018244381),1,9.98-15.00,https://www.lowes.com/pd/Harbor-Breeze-60-Lumens-1-Watt-Black-Warm-White-Solar-LED-Spot-light/5018244381,2026-07 deal history (Lowe's blocks automated checks),Panel + cell + housing; $15 regular; ~$9 each for 6+
+xiao-harbor-breeze,2,Seeed XIAO nRF52840 & Wio-SX1262 Kit,1,13.49,https://www.seeedstudio.com/XIAO-nRF52840-Wio-SX1262-Kit-for-Meshtastic-p-6400.html,2026-10-19,In stock; no antenna included
+xiao-harbor-breeze,3a,915 MHz U.FL whip/FPC antenna (internal),1,2.00-4.00,https://www.olimex.com/Products/Components/RF/ANTENNA-20CM-915MHZ-U-FL/,EUR 3.95 (Olimex),Cheapest option; mount away from panel and cell
+xiao-harbor-breeze,3b,SMA-to-IPEX 120 mm cable + 915 MHz SMA antenna (external alternative),1,6.90-10.90,https://www.seeedstudio.com/XIAO-nRF52840-Wio-SX1262-Kit-for-Meshtastic-p-6400.html,2026-10-19 (cable $1.90),Antenna price typical/unverified; seal bulkhead with silicone
+xiao-harbor-breeze,4,24-26 AWG silicone hook-up wire (red+black ~20 cm),1,0.20,,shop stock,Cell terminals to XIAO BAT+/BAT- pads
+xiao-harbor-breeze,5,Heat-shrink / Kapton tape / neutral-cure silicone,1,1.00,,shop stock,Insulation and sealing
+rak4631-harbor-breeze,1,Harbor Breeze 60 lm 1 W solar LED spot light,1,9.98-15.00,https://www.lowes.com/pd/Harbor-Breeze-60-Lumens-1-Watt-Black-Warm-White-Solar-LED-Spot-light/5018244381,2026-07 deal history,
+rak4631-harbor-breeze,2,RAK19007 + RAK4631 bundle,1,29.99,https://ameridroid.com/products/wisblock-rak19007-rak4631-board,cached,Solar input Li-ion only and 5.5 V max
+rak4631-harbor-breeze,3,IPEX-to-SMA pigtail + 915 MHz antenna,1,6.00-12.00,,typical/unverified,
