@@ -2665,14 +2665,21 @@ void work_while_waiting() { loop(); }
 
 #if defined(HEADLESS_REPEATER)
   // microReticulum re-enters loop() through its loop callback while it works
-  // through long jobs; only the outermost pass may put the CPU to sleep.
+  // through long jobs; only the outermost pass may put the CPU to sleep. The
+  // guard also restores the depth when an exception unwinds a nested pass
+  // (OS::run_loop() catches it), so idle sleep and battery protection can't
+  // be switched off by one stray exception.
   static uint8_t loop_depth = 0;
+  struct LoopDepthGuard {
+    LoopDepthGuard()  { loop_depth++; }
+    ~LoopDepthGuard() { loop_depth--; }
+  };
 #endif
 
 void loop() {
 
   #if defined(HEADLESS_REPEATER)
-    loop_depth++;
+    LoopDepthGuard loop_depth_guard;
   #endif
 
   #if MCU_VARIANT == MCU_NATIVE
@@ -2823,7 +2830,6 @@ void loop() {
 
   #if defined(HEADLESS_REPEATER)
     if (loop_depth == 1) { repeater_loop(); }
-    loop_depth--;
   #endif
 }
 
