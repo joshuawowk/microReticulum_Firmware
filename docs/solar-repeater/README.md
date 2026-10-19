@@ -291,8 +291,9 @@ unchanged.
 * **Protects the cell.** If the averaged battery voltage stays below the
   cutoff for 60 s, the node does three things:
   1. saves the path table
-  2. puts the radio to sleep and stops BLE
-  3. hibernates
+  2. puts the radio to sleep, and stops BLE advertising and any connection
+  3. hibernates (on ESP32 it also holds the radio's chip-select line high so
+     the radio stays asleep)
 
   An nRF52 stays in System ON sleep and re-checks the battery every 30 s. An
   ESP32 uses timed deep sleep and re-checks every 5 min. After three readings
@@ -369,7 +370,12 @@ Please share your numbers so the estimates can be replaced with data.
   are datasheet estimates. Builds are verified for every repeater env; field
   measurements are welcome.
 * Hibernation needs battery sensing. The XIAO ESP32S3 has none, so it runs
-  until the cell or the board's own protection cuts out.
+  until the cell or the board's own protection cuts out. Its build prints a
+  `#warning` to say so.
+* After a cold boot (for example when a cell's protection circuit releases),
+  the radio starts once the cell is above the cutoff, not the resume voltage.
+  If the cell is still weak, the node runs briefly, hibernates again, and
+  then waits for the resume voltage.
 * The XIAO's 2 MB QSPI flash is not used yet, so the path table lives in
   internal flash: 25 records, like the other internal-flash nRF52 targets.
 * Heltec T114 and ProMicro "Faketec" boards are good low-power candidates but
