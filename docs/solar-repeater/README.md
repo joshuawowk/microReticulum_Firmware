@@ -89,7 +89,9 @@ about **7 days** without sun. A 1000 mAh LiFePO4 cell lasts about **5 days**.
 | Heltec V4 | ESP32-S3 / SX1262 + 28 dBm PA/LNA | ≈ $18–28 | No: needs a bigger panel | `heltec_wifi_lora_32_V4-repeater` |
 | LilyGO LoRa32 v2.1 (T3 v1.6 / v1.6.1) | ESP32 / SX1276 | ≈ $15–20 | No: needs a bigger panel | `ttgo-lora32-v21-repeater` |
 | XIAO ESP32S3 + Wio-SX1262 | ESP32-S3 / SX1262 | ≈ $14 | No; also has no battery sensing | `seeed_xiao_esp32s3-repeater` |
-| Heltec T114, ProMicro "Faketec" | nRF52840 / SX1262 | $10–25 | Yes | Not yet (see [Limitations](#limitations)) |
+| ProMicro nRF52840 + HT-RA62 / E22-900M22S ("Faketec") | nRF52840 / SX1262 | ≈ $12–16 + SMD soldering | Probably, if you fit a battery divider and avoid 30 dBm modules and leaky board batches ([details](research/04-promicro-faketec.md)) | Not yet |
+| Heltec T114 | nRF52840 / SX1262 | ≈ $18–34 | Probably, with its TFT/GPS/LED rail switched off | Not yet |
+| Heltec HT-N5262M bare module | nRF52840 / SX1262 | $14.90 + your own carrier PCB | Unproven: Heltec publishes 33 mA RX ([details](research/05-heltec-ht-n5262m.md)) | Not yet |
 
 The Wio-SX1262 in the nRF52840 kit is **wired differently** from the one in
 the XIAO ESP32S3 kit. The ESP32S3 kit's radio can still be moved onto a XIAO
