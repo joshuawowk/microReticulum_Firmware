@@ -90,6 +90,19 @@ D10, **DIO2 as RF switch**, **DIO3 TCXO 1.8 V**, no radio power-enable pin.
 Meshtastic and MeshCore agree exactly (MeshCore also sets
 `SX126X_CURRENT_LIMIT=140`, `SX126X_RX_BOOSTED_GAIN=1`, `LORA_TX_POWER=22`).
 
+### B2B-version Wio-SX1262 (from the XIAO ESP32S3 kit) on a XIAO nRF52840
+
+Seeed's [Wio-SX1262 for XIAO V1.0 schematic](https://files.seeedstudio.com/products/SenseCAP/Wio_SX1262/Schematic_Diagram_Wio-SX1262_for_XIAO.pdf)
+(read 2026-10-19) shows the module wired to both the 30-pin B2B connector (J3)
+and two 1×7 XIAO headers. J1: pin1 LORA_DIO1, pin2 LORA_BUSY, pin3 LORA_RST,
+pin4 LORA_SPI_NSS, pin5 LORA_RF_SW1, pins 6–7 NC. J2: pin1 VIN, pin2 GND,
+pin3 +3V3, pin4 MOSI, pin5 MISO, pin6 SCK, pin7 NC. The button (K1) and LED
+(D1) go only to the B2B connector. On the XIAO footprint this is D0 DIO1,
+D1 BUSY, D2 RST, D3 NSS, D4 RXEN, D8 SCK, D9 MISO, D10 MOSI, matching
+Meshtastic's `SEEED_XIAO_NRF_WIO_BTB` column, which came from the community
+DIY variant in [meshtastic/firmware#5976](https://github.com/meshtastic/firmware/pull/5976).
+Implemented here as `-DXIAO_WIO_B2B`.
+
 ### Power management notes
 
 * VBAT divider enable P0.14 is **active LOW**. MeshCore holds it LOW permanently

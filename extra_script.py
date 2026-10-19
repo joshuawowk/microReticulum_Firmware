@@ -169,7 +169,7 @@ def device_provision(env):
             env.Execute("rnodeconf --product 15 --model 17 --hwrev 1 --rom " + env.subst("$UPLOAD_PORT"))
         case "heltec_t114" | "heltec_t114_local":
             env.Execute("rnodeconf --product c2 --model c7 --hwrev 1 --rom " + env.subst("$UPLOAD_PORT"))
-        case "xiao_nrf52840" | "xiao_nrf52840_local":
+        case "xiao_nrf52840" | "xiao_nrf52840_local" | "xiao_nrf52840_wio_b2b":
             # No dedicated rnodeconf product exists; provision as homebrew
             env.Execute("rnodeconf --product f0 --model fe --hwrev 1 --rom " + env.subst("$UPLOAD_PORT"))
         case _:

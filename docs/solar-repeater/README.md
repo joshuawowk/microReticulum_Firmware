@@ -91,8 +91,10 @@ about **7 days** without sun. A 1000 mAh LiFePO4 cell lasts about **5 days**.
 | XIAO ESP32S3 + Wio-SX1262 | ESP32-S3 / SX1262 | ≈ $14 | No; also has no battery sensing | `seeed_xiao_esp32s3-repeater` |
 | Heltec T114, ProMicro "Faketec" | nRF52840 / SX1262 | $10–25 | Yes | Not yet (see [Limitations](#limitations)) |
 
-The Wio-SX1262 in the nRF52840 kit is **not wired the same** as the one in the
-XIAO ESP32S3 kit, so radios cannot be swapped between the two kits.
+The Wio-SX1262 in the nRF52840 kit is **wired differently** from the one in
+the XIAO ESP32S3 kit. The ESP32S3 kit's radio can still be moved onto a XIAO
+nRF52840 with a little soldering and its own firmware build; see
+[Reusing a Wio-SX1262 from a XIAO ESP32S3 kit](#reusing-a-wio-sx1262-from-a-xiao-esp32s3-kit).
 
 ## Bill of materials
 
@@ -125,6 +127,50 @@ one-time setup.
 Build `wiscore_rak4631-repeater` (or `-lifepo4`). If the cell is LiFePO4, do
 **not** use the RAK's solar or battery charger. Keep the light's controller
 and feed the RAK from the cell, exactly as in the XIAO LiFePO4 wiring below.
+
+### Reusing a Wio-SX1262 from a XIAO ESP32S3 kit
+
+If you already own XIAO ESP32S3 & Wio-SX1262 kits, you only need a bare
+**XIAO nRF52840** ([$9.99 at Seeed](https://www.seeedstudio.com/Seeed-XIAO-BLE-nRF52840-p-5201.html),
+$8.99 each for 10+, checked 2026-10-19). Reuse the kit's Wio-SX1262 and its
+2 dBi antenna. The radio then costs nothing extra, so the node is about
+**$20–25** including the light.
+
+The kit's radio is the **board-to-board (B2B) version** of the Wio-SX1262
+("Wio-SX1262 for XIAO V1.0"). The XIAO nRF52840 has no B2B connector, but the
+Wio board also routes every LoRa signal to its two rows of XIAO header holes
+([Seeed schematic](https://files.seeedstudio.com/products/SenseCAP/Wio_SX1262/Schematic_Diagram_Wio-SX1262_for_XIAO.pdf)).
+The pinout differs from the nRF52840 kit's radio:
+
+| XIAO pin | B2B Wio (ESP32S3 kit) | Wio from the nRF52840 kit |
+|---|---|---|
+| D0 | DIO1 | — |
+| D1 | BUSY | DIO1 |
+| D2 | RESET | RESET |
+| D3 | NSS | BUSY |
+| D4 | RXEN (RF switch) | NSS |
+| D5 | — | RXEN (RF switch) |
+| D8 / D9 / D10 | SCK / MISO / MOSI | SCK / MISO / MOSI |
+| 5V / GND / 3V3 | VIN / GND / 3V3 | VIN / GND / 3V3 |
+
+Assembly:
+
+1. Unplug the Wio-SX1262 from the XIAO ESP32S3's B2B connector.
+2. Solder the battery leads to the XIAO nRF52840's **BAT+ / BAT−** pads on
+   its underside first. They are hard to reach once the boards are stacked.
+3. Stack the XIAO nRF52840 on the Wio board in the **same orientation the
+   ESP32S3 had**, with the same outline and the USB-C over the same edge. That
+   puts D0 on the Wio's DIO1 hole. Before soldering, confirm with a
+   continuity tester that the Wio's GND and 3V3 holes line up with the XIAO's
+   GND and 3V3 pins. A flipped stack would put 5 V on a signal pin. Then
+   solder both 1×7 rows with pin headers (stacking above or below both work).
+4. Flash a `xiao_nrf52840-wio-b2b*` build (table below). The plain
+   `xiao_nrf52840*` builds use the other pinout and **will not find the radio**.
+
+The Wio board's user button and green LED are wired only to the B2B
+connector, so they don't work on this stack. A repeater doesn't need them.
+This pin map matches Meshtastic's `SEEED_XIAO_NRF_WIO_BTB` variant, which
+community builders have used on this exact combination.
 
 ### Using the ESP32 boards you already have
 
@@ -227,6 +273,8 @@ are:
 |---|---|---|
 | `xiao_nrf52840-repeater` | XIAO nRF52840 + Wio-SX1262 | Li-ion |
 | `xiao_nrf52840-repeater-lifepo4` | XIAO nRF52840 + Wio-SX1262 | LiFePO4 |
+| `xiao_nrf52840-wio-b2b-repeater` | XIAO nRF52840 + B2B Wio-SX1262 from an ESP32S3 kit | Li-ion |
+| `xiao_nrf52840-wio-b2b-repeater-lifepo4` | XIAO nRF52840 + B2B Wio-SX1262 from an ESP32S3 kit | LiFePO4 |
 | `wiscore_rak4631-repeater` | RAK4631 | Li-ion |
 | `wiscore_rak4631-repeater-lifepo4` | RAK4631 | LiFePO4 |
 | `heltec_wifi_lora_32_V4-repeater` | Heltec V4 | Li-ion |

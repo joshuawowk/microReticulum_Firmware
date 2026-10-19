@@ -6,12 +6,12 @@
 const uint32_t g_ADigitalPinMap[] =
 {
   // D0 .. D10
-  2,  // D0  is P0.02 (A0)
-  3,  // D1  is P0.03 (A1)   SX1262 DIO1
+  2,  // D0  is P0.02 (A0)   SX1262 DIO1 on the B2B-version Wio
+  3,  // D1  is P0.03 (A1)   SX1262 DIO1 (kit Wio) / BUSY (B2B Wio)
   28, // D2  is P0.28 (A2)   SX1262 RESET
-  29, // D3  is P0.29 (A3)   SX1262 BUSY
-  4,  // D4  is P0.04 (A4)   SX1262 NSS
-  5,  // D5  is P0.05 (A5)   SX1262 RXEN
+  29, // D3  is P0.29 (A3)   SX1262 BUSY (kit Wio) / NSS (B2B Wio)
+  4,  // D4  is P0.04 (A4)   SX1262 NSS (kit Wio) / RXEN (B2B Wio)
+  5,  // D5  is P0.05 (A5)   SX1262 RXEN (kit Wio)
   43, // D6  is P1.11 (TX)
   44, // D7  is P1.12 (RX)
   45, // D8  is P1.13 (SCK)

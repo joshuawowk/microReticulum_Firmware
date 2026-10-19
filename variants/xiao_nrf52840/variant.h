@@ -100,7 +100,11 @@ static const uint8_t A5  = PIN_A5;
 #define PIN_SPI_MOSI            (10)
 #define PIN_SPI_SCK             (8)
 
+#if defined(XIAO_WIO_B2B)
+static const uint8_t SS   = 3;
+#else
 static const uint8_t SS   = 4;
+#endif
 static const uint8_t MOSI = PIN_SPI_MOSI;
 static const uint8_t MISO = PIN_SPI_MISO;
 static const uint8_t SCK  = PIN_SPI_SCK;
