@@ -173,7 +173,7 @@ def firmware_hash(source, env):
     source_file = source[0].get_abspath()
     platform = env.GetProjectOption("platform")
     print("Platform:", platform)
-    if (platform == "nordicnrf52"):
+    if ("nordicnrf52" in platform):
         build_dir = env.subst("$BUILD_DIR")
         env.Execute("cd " + build_dir + "; unzip -o " + source_file + " " + env.subst("$PROGNAME") + ".bin")
         #source_file.replace(".zip", ".bin")
@@ -227,7 +227,7 @@ def firmware_package(env):
     print("build_dir:", build_dir)
     env.Execute("mkdir -p " + project_dir + "/Release")
     env.Execute("mkdir -p " + project_dir + "/Debug")
-    if (platform == "espressif32"):
+    if ("espressif32" in platform):
         #env.Execute("cp " + packages_dir + "/framework-arduinoespressif32/tools/partitions/boot_app0.bin " + build_dir + "/rnode_firmware_" + variant + ".boot_app0")
         env.Execute("cp ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin " + build_dir + "/rnode_firmware_" + variant + ".boot_app0")
         env.Execute("cp " + build_dir + "/bootloader.bin " + build_dir + "/" + env.subst("$PROGNAME") + ".bootloader")
@@ -249,7 +249,7 @@ def firmware_package(env):
         zip_cmd += build_dir + "/" + env.subst("$PROGNAME") + ".elf "
         zip_cmd += build_dir + "/" + env.subst("$PROGNAME") + ".map "
         env.Execute(zip_cmd)
-    elif (platform == "nordicnrf52"):
+    elif ("nordicnrf52" in platform):
         env.Execute("cp " + build_dir + "/" + env.subst("$PROGNAME") + ".zip " + project_dir + "/Release/.")
     else:
         env.Execute("cp " + build_dir + "/" + env.subst("$PROGNAME") + " " + build_dir + "/rnoded")
@@ -285,7 +285,7 @@ if env.IsCleanTarget():
         full_clean(env)
 
 # Add custom targets
-if (platform == "espressif32"):
+if ("espressif32" in platform):
     env.AddCustomTarget(
         name="package",
         dependencies="$BUILD_DIR/${PROGNAME}.bin",
@@ -295,7 +295,7 @@ if (platform == "espressif32"):
         title="Package",
         description="Package esp32 firmware for delivery"
     )
-elif (platform == "nordicnrf52"):
+elif ("nordicnrf52" in platform):
     # remove --specs=nano.specs to allow exceptions to work
     if '--specs=nano.specs' in env['LINKFLAGS']:
         env['LINKFLAGS'].remove('--specs=nano.specs')
