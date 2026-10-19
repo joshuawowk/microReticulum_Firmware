@@ -150,8 +150,15 @@ Different production runs of these lights ship different cells:
 
 Read the label. Then measure the cell after a sunny day: a LiFePO4 cell sits
 near 3.3–3.4 V, while a Li-ion cell sits at 3.9–4.2 V. If you cannot tell,
-treat the cell as **LiFePO4**. A LiFePO4 build is safe on either chemistry; a
-Li-ion build is not.
+treat the cell as **LiFePO4**:
+
+* **Wiring:** the LiFePO4 wiring below (keep the stock controller, never
+  USB-charge the cell through the XIAO) is safe for either cell.
+* **Firmware:** the thresholds should still match the cell. If you really
+  cannot tell, the `-lifepo4` build is the lesser evil. On a Li-ion cell it
+  runs the cell down to 2.95 V, a deeper discharge than ideal but not
+  dangerous. A Li-ion build on a LiFePO4 cell would instead hibernate at
+  about 50 % charge and only wake in strong sun.
 
 ### 2. Wiring
 
@@ -283,11 +290,12 @@ unchanged.
   receive-done interrupt gives that notification, so an arriving packet wakes
   the CPU at once, and FreeRTOS tickless idle sleeps it in between:
   `sd_app_evt_wait()` on nRF52, `waiti` on ESP32. The node stays fully awake
-  in four situations:
+  in five situations:
   * packets are queued to transmit (CSMA needs exact timing)
   * serial input is pending
   * a USB host has the port open (nRF52)
-  * a BLE client is connected
+  * a BLE client is connected or pairing
+  * the console or Wi-Fi is active (not compiled into ESP32 repeater builds)
 * **Protects the cell.** If the averaged battery voltage stays below the
   cutoff for 60 s, the node does three things:
   1. saves the path table
