@@ -399,6 +399,13 @@ extern RNS::Reticulum reticulum;
 		void led_tx_off() { digitalWrite(pin_led_tx, LOW); }
 		void led_id_on()  { }
 		void led_id_off() { }
+	#elif BOARD_MODEL == BOARD_XIAO_NRF52
+		void led_rx_on()  { digitalWrite(pin_led_rx, LED_ON); }
+		void led_rx_off() {	digitalWrite(pin_led_rx, LED_OFF); }
+		void led_tx_on()  { digitalWrite(pin_led_tx, LED_ON); }
+		void led_tx_off() { digitalWrite(pin_led_tx, LED_OFF); }
+		void led_id_on()  { }
+		void led_id_off() { }
 	#elif BOARD_MODEL == BOARD_HELTEC_T114
     // Heltec T114 pulls pins LOW to turn on
     void led_rx_on()  { digitalWrite(pin_led_rx, LOW); }
@@ -1798,6 +1805,8 @@ bool eeprom_model_valid() {
   if (model == MODEL_11 || model == MODEL_12) {
   #elif BOARD_MODEL == BOARD_RAK3401
   if (model == MODEL_13 || model == MODEL_14) {
+  #elif BOARD_MODEL == BOARD_XIAO_NRF52
+  if (model == MODEL_FE || model == MODEL_FF) {
 	#elif BOARD_MODEL == BOARD_HUZZAH32
 	if (model == MODEL_FF) {
 	#elif BOARD_MODEL == BOARD_GENERIC_ESP32

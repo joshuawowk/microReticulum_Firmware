@@ -1,3 +1,4 @@
+import os
 import time
 import hashlib
 import shutil
@@ -164,6 +165,9 @@ def device_provision(env):
             env.Execute("rnodeconf --product 15 --model 17 --hwrev 1 --rom " + env.subst("$UPLOAD_PORT"))
         case "heltec_t114" | "heltec_t114_local":
             env.Execute("rnodeconf --product c2 --model c7 --hwrev 1 --rom " + env.subst("$UPLOAD_PORT"))
+        case "xiao_nrf52840" | "xiao_nrf52840_local":
+            # No dedicated rnodeconf product exists; provision as homebrew
+            env.Execute("rnodeconf --product f0 --model fe --hwrev 1 --rom " + env.subst("$UPLOAD_PORT"))
         case _:
             print(f"Unknown board variant {variant}, can not provision device!")
 
@@ -322,3 +326,13 @@ else:
 # Register actions
 env.AddPreAction("upload", pre_upload)
 env.AddPostAction("upload", post_upload)
+
+# nRF52 boards with an Adafruit-derived bootloader (RAK4631, T-Echo, XIAO
+# nRF52840, ...) accept UF2 images by drag-and-drop onto the drive they mount
+# after a double-tap of RESET, so emit a .uf2 next to the .hex and .zip.
+if ("nordicnrf52" in platform):
+    uf2conv = os.path.join(env.PioPlatform().get_package_dir("framework-arduinoadafruitnrf52") or "",
+                           "tools", "uf2conv", "uf2conv.py")
+    env.AddPostAction("$BUILD_DIR/${PROGNAME}.hex", env.VerboseAction(
+        '"$PYTHONEXE" "%s" -f 0xADA52840 -c -o "$BUILD_DIR/${PROGNAME}.uf2" "$BUILD_DIR/${PROGNAME}.hex"' % uf2conv,
+        "Building $BUILD_DIR/${PROGNAME}.uf2"))

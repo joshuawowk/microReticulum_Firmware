@@ -562,6 +562,11 @@ int sx126x::beginPacket(int implicitHeader) {
   #endif
 
   standby();
+  #if RXEN_IS_RF_SWITCH
+    // Release the RX path of the RF switch; DIO2 selects TX. receive()
+    // re-asserts RXEN through rxAntEnable() once the packet is sent.
+    if (_rxen != -1) { digitalWrite(_rxen, LOW); }
+  #endif
   if (implicitHeader) { implicitHeaderMode(); }
   else { explicitHeaderMode(); }
 
@@ -843,6 +848,9 @@ void sx126x::enableTCXO() {
         #elif BOARD_MODEL == BOARD_HELTEC32_V4
           mode = MODE_TCXO_1_8V_6X;
         #elif BOARD_MODEL == BOARD_HELTEC_TRACKER_V2
+          mode = MODE_TCXO_1_8V_6X;
+        #elif BOARD_MODEL == BOARD_XIAO_NRF52
+          // Wio-SX1262 (SX126X_DIO3_TCXO_VOLTAGE 1.8 in Meshtastic and MeshCore)
           mode = MODE_TCXO_1_8V_6X;
         #endif
       }
