@@ -123,6 +123,11 @@
   #define MODEL_13            0x13 // RAK3401 + RAK13302, 433 MHz
   #define MODEL_14            0x14 // RAK3401 + RAK13302, 868 MHz
 
+  // Seeed XIAO nRF52840 + Wio-SX1262 kit. rnodeconf has no product entry for
+  // this board, so it is provisioned as a homebrew RNode (PRODUCT_HMBRW with
+  // MODEL_FE or MODEL_FF); the board code below selects the pin map.
+  #define BOARD_XIAO_NRF52    0x53
+
   #define PIN_3V3_EN          34   // WB_IO2 — 5V boost + 3V3_S rail (RAK13302 FEM)
 
   #define PRODUCT_HMBRW       0xF0
@@ -167,7 +172,7 @@
   #endif
 
   #ifndef MODEM
-    #if BOARD_MODEL == BOARD_RAK4631 || BOARD_MODEL == BOARD_RAK3401
+    #if BOARD_MODEL == BOARD_RAK4631 || BOARD_MODEL == BOARD_RAK3401 || BOARD_MODEL == BOARD_XIAO_NRF52
       #define MODEM SX1262
     #elif BOARD_MODEL == BOARD_GENERIC_NRF52
       #define MODEM SX1262
@@ -1053,6 +1058,52 @@
       const int DISPLAY_BL_PIN = PIN_T114_TFT_BLGT;
       const int DISPLAY_RST = PIN_T114_TFT_RST;
 
+    #elif BOARD_MODEL == BOARD_XIAO_NRF52
+      #define HAS_EEPROM false
+      #define HAS_DISPLAY false
+      #define HAS_BLUETOOTH false
+      #define HAS_BLE true
+      #define HAS_CONSOLE false
+      #define HAS_PMU true
+      #define HAS_NP false
+      #define HAS_SD false
+      #define HAS_TCXO true
+      #define HAS_RF_SWITCH_RX_TX true
+      #define HAS_BUSY true
+      #define HAS_INPUT false
+      #define DIO2_AS_RF_SWITCH true
+      // The Wio-SX1262 RF switch has two control lines: DIO2 (TX) and RXEN.
+      // RXEN must be released during transmit, so it is not held high.
+      #define RXEN_IS_RF_SWITCH true
+      #define CONFIG_UART_BUFFER_SIZE 6144
+      #define CONFIG_QUEUE_SIZE 6144
+      #define CONFIG_QUEUE_MAX_LENGTH 200
+      #define EEPROM_SIZE 296
+      #define EEPROM_OFFSET EEPROM_SIZE-EEPROM_RESERVED
+      #define BLE_MANUFACTURER "Seeed Studio"
+      #define BLE_MODEL "XIAO nRF52840"
+
+      // The factory bootloader carries SoftDevice S140 7.3.0, which moves
+      // the application start up one page (see boards/nrf52840_s140_v7.ld).
+      #define APPLICATION_START 0x27000
+
+      #define LED_ON LOW
+      #define LED_OFF HIGH
+
+      // Wio-SX1262 on the XIAO board-to-board connector
+      const int pin_rxen = 5;          // D5, P0.05
+      const int pin_txen = -1;         // TX path is selected by DIO2
+      const int pin_reset = 2;         // D2, P0.28
+      const int pin_cs = 4;            // D4, P0.04
+      const int pin_sclk = 8;          // D8, P1.13
+      const int pin_mosi = 10;         // D10, P1.15
+      const int pin_miso = 9;          // D9, P1.14
+      const int pin_busy = 3;          // D3, P0.29
+      const int pin_dio = 1;           // D1, P0.03 (DIO1)
+      const int pin_led_rx = LED_BLUE;
+      const int pin_led_tx = LED_GREEN;
+      const int pin_tcxo_enable = -1;  // TCXO powered by DIO3 at 1.8 V
+
     #else
       #error An unsupported nRF board was selected. Cannot compile RNode firmware.
     #endif
@@ -1130,6 +1181,10 @@
 
   #ifndef DIO2_AS_RF_SWITCH
     #define DIO2_AS_RF_SWITCH false
+  #endif
+
+  #ifndef RXEN_IS_RF_SWITCH
+    #define RXEN_IS_RF_SWITCH false
   #endif
 
   // Default OCP value if not specified

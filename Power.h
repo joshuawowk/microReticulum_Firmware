@@ -213,6 +213,22 @@ float pmu_temperature = PMU_TEMP_MIN-1;
   bool bat_voltage_dropping = false;
   float bat_delay_v = 0;
   float bat_state_change_v = 0;
+#elif BOARD_MODEL == BOARD_XIAO_NRF52
+  #define BAT_V_MIN       3.15
+  #define BAT_V_MAX       4.2
+  #define BAT_V_CHG       4.48
+  #define BAT_V_FLOAT     4.33
+  #define BAT_SAMPLES     7
+  const uint8_t pin_vbat = PIN_VBAT;
+  float bat_p_samples[BAT_SAMPLES];
+  float bat_v_samples[BAT_SAMPLES];
+  uint8_t bat_samples_count = 0;
+  int bat_discharging_samples = 0;
+  int bat_charging_samples = 0;
+  int bat_charged_samples = 0;
+  bool bat_voltage_dropping = false;
+  float bat_delay_v = 0;
+  float bat_state_change_v = 0;
 #endif
 
 uint32_t last_pmu_update = 0;
@@ -235,7 +251,7 @@ void measure_temperature() {
 }
 
 void measure_battery() {
-  #if BOARD_MODEL == BOARD_RNODE_NG_21 || BOARD_MODEL == BOARD_LORA32_V2_1 || BOARD_MODEL == BOARD_HELTEC32_V3 || BOARD_MODEL == BOARD_HELTEC32_V4 || BOARD_MODEL == BOARD_HELTEC_TRACKER_V2 || BOARD_MODEL == BOARD_TDECK || BOARD_MODEL == BOARD_T3S3 || BOARD_MODEL == BOARD_HELTEC_T114 || BOARD_MODEL == BOARD_TECHO || BOARD_MODEL == BOARD_RAK4631 || BOARD_MODEL == BOARD_RAK3401
+  #if BOARD_MODEL == BOARD_RNODE_NG_21 || BOARD_MODEL == BOARD_LORA32_V2_1 || BOARD_MODEL == BOARD_HELTEC32_V3 || BOARD_MODEL == BOARD_HELTEC32_V4 || BOARD_MODEL == BOARD_HELTEC_TRACKER_V2 || BOARD_MODEL == BOARD_TDECK || BOARD_MODEL == BOARD_T3S3 || BOARD_MODEL == BOARD_HELTEC_T114 || BOARD_MODEL == BOARD_TECHO || BOARD_MODEL == BOARD_RAK4631 || BOARD_MODEL == BOARD_RAK3401 || BOARD_MODEL == BOARD_XIAO_NRF52
     battery_installed = true;
     #if BOARD_MODEL == BOARD_HELTEC32_V3 || BOARD_MODEL == BOARD_HELTEC32_V4 || BOARD_MODEL == BOARD_HELTEC_TRACKER_V2
       battery_indeterminate = false;
@@ -258,6 +274,10 @@ void measure_battery() {
       float battery_measurement = (float)(analogRead(pin_vbat)) * 0.007067;
     #elif BOARD_MODEL == BOARD_RAK4631 || BOARD_MODEL == BOARD_RAK3401
       float battery_measurement = (float)(analogRead(pin_vbat)) * 0.005068;
+    #elif BOARD_MODEL == BOARD_XIAO_NRF52
+      // 12-bit reading against the 3.0 V internal reference, through the
+      // 1 MOhm / 510 kOhm divider: 3.0 / 4096 * (1510 / 510)
+      float battery_measurement = (float)(analogRead(pin_vbat)) * 0.0021686;
     #else
       float battery_measurement = (float)(analogRead(pin_vbat)) / 4095.0*7.26;
     #endif
@@ -490,6 +510,13 @@ bool init_pmu() {
   #elif BOARD_MODEL == BOARD_HELTEC_T114
     pinMode(pin_ctrl,OUTPUT);
     digitalWrite(pin_ctrl, HIGH);
+    return true;
+  #elif BOARD_MODEL == BOARD_XIAO_NRF52
+    // The divider stays enabled (VBAT_ENABLE LOW, set in initVariant())
+    pinMode(VBAT_ENABLE, OUTPUT);
+    digitalWrite(VBAT_ENABLE, LOW);
+    analogReference(AR_INTERNAL_3_0);
+    analogReadResolution(12);
     return true;
   #elif BOARD_MODEL == BOARD_TBEAM
     Wire.begin(I2C_SDA, I2C_SCL);

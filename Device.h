@@ -32,8 +32,11 @@
 #if defined(NRF52840_XXAA)
 // https://learn.adafruit.com/introducing-the-adafruit-nrf52840-feather/hathach-memory-map
 // each section follows along from one another, in this order
-// this is always at the start of the memory map
+// this is always at the start of the memory map. Boards whose bootloader
+// carries SoftDevice S140 7.x define their own (0x27000) in Boards.h.
+#ifndef APPLICATION_START
 #define APPLICATION_START 0x26000
+#endif
 
 #define USER_DATA_START 0xED000
 

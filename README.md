@@ -87,6 +87,22 @@ On erased EEPROM, the Heltec Wireless Tracker V2 enables BLE and explicitly
 disables Wi-Fi; later user choices are preserved. Radio parameters remain unset
 until a user selects region-appropriate values.
 
+### Seeed XIAO nRF52840 + Wio-SX1262
+
+The `xiao_nrf52840` environment targets Seeed's XIAO nRF52840 & Wio-SX1262 kit
+(nRF52840 + SX1262 with a 1.8 V TCXO). Its factory bootloader carries SoftDevice
+S140 7.3.0, so the build uses `boards/nrf52840_s140_v7.ld` (application at
+0x27000). Besides the usual DFU `.zip`, nRF52 builds also produce a `.uf2`:
+double-tap RESET and copy `rnode_firmware_xiao_nrf52840.uf2` onto the drive
+the XIAO mounts, or use `pio run -e xiao_nrf52840 -t upload`.
+
+`rnodeconf` has no product entry for this board, so provision it as a homebrew
+RNode (the `upload` target does this automatically when `rnodeconf` is on the
+`PATH`):
+```
+rnodeconf --product f0 --model fe --hwrev 1 --rom /dev/ttyACM0
+```
+
 Build all environments (boards):
 ```
 pio run
