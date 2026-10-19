@@ -193,6 +193,13 @@ void device_validate_partitions() {
     return;
   #endif
   device_load_firmware_hash();
+  #if !VALIDATE_FIRMWARE
+    // Nothing is compared against the hashes, so skip the flash walk. On a
+    // self-provisioned board the nRF52 bootloader settings may never have
+    // recorded an application size (see below).
+    fw_signature_validated = true;
+    return;
+  #endif
   #if MCU_VARIANT == MCU_ESP32
   esp_partition_t partition;
   partition.address   = ESP_PARTITION_TABLE_OFFSET;
@@ -206,7 +213,12 @@ void device_validate_partitions() {
   esp_partition_get_sha256(esp_ota_get_running_partition(), dev_firmware_hash);
   #elif MCU_VARIANT == MCU_NRF52
   // todo, add bootloader, partition table, or softdevice?
-  calculate_region_hash(APPLICATION_START, APPLICATION_START+retrieve_application_size(), dev_firmware_hash);
+  // The size comes from the bootloader settings page; an erased page reads
+  // 0xFFFFFFFF, which would walk the hash past the end of flash and fault.
+  uint32_t application_size = retrieve_application_size();
+  if (application_size > 0 && application_size <= USER_DATA_START-APPLICATION_START) {
+    calculate_region_hash(APPLICATION_START, APPLICATION_START+application_size, dev_firmware_hash);
+  }
   #endif
   #if VALIDATE_FIRMWARE
     for (uint8_t i = 0; i < DEV_HASH_LEN; i++) {
